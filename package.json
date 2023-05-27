@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-k2345-security",
   "description": "2345-Security: 完全保护您的Koishi - Prevent from using Koishi",
-  "version": "0.3.0-1",
+  "version": "0.3.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
