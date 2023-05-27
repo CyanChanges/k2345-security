@@ -1,4 +1,4 @@
-# koishi-plugin-breaks-koishi
+# koishi-plugin-k2345-security
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-breaks-koishi?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-breaks-koishi)
 
