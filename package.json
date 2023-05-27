@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-breaks-koishi",
   "description": "阻止Koishi各种功能正常工作 - Prevent features in Koishi from working properly",
-  "version": "0.1.1",
+  "version": "0.2.0-0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
