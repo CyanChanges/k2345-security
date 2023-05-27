@@ -1,7 +1,7 @@
 {
-  "name": "koishi-plugin-breaks-koishi",
-  "description": "阻止Koishi各种功能正常工作 - Prevent features in Koishi from working properly",
-  "version": "0.2.0-0",
+  "name": "koishi-plugin-k2345-security",
+  "description": "2345-Security: 完全保护您的Koishi - Prevent from using Koishi",
+  "version": "0.3.0-1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -10,8 +10,8 @@
   ],
   "koishi": {
     "description": {
-      "zh": "阻止Koishi各种功能正常工作",
-      "en": "Prevent features in Koishi from working properly"
+      "zh": "完全保护您的Koishi",
+      "en": "Prevent from using Koishi"
     },
     "insecure": true
   },
@@ -24,5 +24,8 @@
   ],
   "peerDependencies": {
     "koishi": "^4.13.0"
+  },
+  "dependencies": {
+    "koishi-plugin-koishi-2345": "latest"
   }
 }
