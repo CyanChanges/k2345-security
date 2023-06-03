@@ -4,7 +4,7 @@
 
 [Insecure]
 
-Koishi 2345 <small style="color: #0000000A">in</small>Security - Koishi 2345 <small style="color: #0000000A">不</small>安全
+Koishi 2345 <del><small style="color: #0000000A">in</small></del>Security - Koishi 2345 安全中心
 
 保护您的Koishi不受 不安全插件 的侵害
 Prevent you from using koishi
