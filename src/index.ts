@@ -3,190 +3,27 @@ import {I18n} from '@koishijs/core'
 import NodeLoader from '@koishijs/loader'
 import {} from '@koishijs/plugin-market'
 import {} from '@koishijs/plugin-explorer'
-import {} from '@koishijs/plugin-console'
+import {Listener} from '@koishijs/plugin-console'
 import ns from 'ns-require'
 import path from 'path'
+import {camelCase} from "./utils";
+import {K2345s, PublicK2345s, HookPass} from "./k2345s";
+
+export {PublicK2345s as K2345s, HookPass}
 
 export const name = 'k2345-security'
 
-export const reusable = true
-
-class Feat {
-  ctx?: Context | { config: Object } = {config: {}}
-  #feats: Map<string, boolean> = new Map<string, boolean>()
-
-  hasFeat(featName: string) {
-    return this.#feats.has(String(featName))
-  }
-
-  setFeat(featName: string, enable: boolean | null) {
-    this.#feats.set(String(removePrefix(featName, 'block')), enable)
-    let setName = String(featName)
-    if (!setName.startsWith('option')) setName = String(addPrefix(featName, 'option'))
-    this.ctx.config[String(setName)] = enable
-  }
-
-  getFeat(featName: string) {
-    return this.#feats.get(String(featName))
-  }
-}
-
-class BreakFeaturesConfig {
-  loaded = false
-  context: Context
-  feats = new Feat()
-}
-
-class k2345s {
-  static logger = new Logger('k2345-security')
-  static protectionTimes = 0
-  static config: BreakFeaturesConfig = new BreakFeaturesConfig()
-
-  static consoleBroadcastAlert(ctx: Context, name?: string, message?: string) {
-    ctx.console.broadcast(
-      'k2345-defended',
-      {
-        "message": "k2345Security - " + (message ?? `已保护你的 Koishi 免受一次威胁`),
-        "name": name ?? 'function'
-      },
-      {
-        authority: 3,
-        immediate: true
-      }
-    )
-  }
-
-  static protectAlert(name?: string, message?: string) {
-    this.protectionTimes++
-    if (message) this.logger.info(`k2345Security - ${message} \n
-    k2345S 已保护你的 Koishi ${this.protectionTimes} 次`)
-    if (!this.config.context.console) {
-      this.config.context.using(['console'], (ctx) => {
-        this.consoleBroadcastAlert(ctx.root, name, message)
-      })
-    } else {
-      this.consoleBroadcastAlert(k2345s.config.context.root, name, message)
-    }
-  }
-
-  static hooker(name, func: (...args) => any, message?: string, result_hook: (result: any, args: any[]) => any = ret => ret) {
-    let originFunc = func
-
-    let hookedName = name
-    let onHookMessage = message
-
-    if (!this.config.feats.hasFeat(name))
-      this.config.feats.setFeat(name, false)
-
-    let cls = this
-
-    function _hooked(...args) {
-      cls.logger.debug(`called hooked method(function) ${name}`)
-      if (!cls.config.feats.getFeat(name)) {
-        return result_hook.call(this, originFunc.apply(this, args), args)
-      }
-      cls.protectAlert(hookedName, onHookMessage)
-      cls.logger.debug(`passed ${name}`)
-    }
-
-    this.logger.debug(`hooked ${name}`)
-    return _hooked
-  }
-
-  static async_hooker(name, func: (...args) => Promise<any> | any, message?: string,
-                      result_hook: (result: any, args: any[]) => Promise<any> = async ret => ret): (...args) => Promise<any> {
-    let origin_func = func
-
-    let hookedName = name
-    let onHookMessage = message
-
-    if (!this.config.feats.hasFeat(name))
-      this.config.feats.setFeat(name, false)
-
-    let cls = this
-
-    async function _hooked(...args) {
-      cls.logger.debug(`called hooked async method(function) ${name}`)
-      if (!cls.config.feats.getFeat(name)) {
-        let retVal: Promise<any> | any = origin_func.apply(this, args)
-        if (retVal && retVal.constructor == Promise) {
-          return await result_hook.call(this, await retVal, args)
-        }
-        return await result_hook.call(this, retVal, args)
-      }
-      cls.protectAlert(hookedName, onHookMessage)
-      cls.logger.debug(`passed ${name}`)
-      return undefined
-    }
-
-    this.logger.debug(`hooking ${name}`)
-    return _hooked
-  }
-}
-
-class PublicFeat {
-  #config: BreakFeaturesConfig
-
-  constructor(config: BreakFeaturesConfig) {
-    this.#config = config
-  }
-
-  has(name: string) {
-    return this.#config.feats.hasFeat(name)
-  }
-
-  set(name: string, enable: boolean | null) {
-    if (this.get(name) != enable) {
-      if (!enable) {
-        throw Error("Cannot disable a feat")
-      }
-    }
-    this.#config.feats.setFeat(name, enable)
-  }
-
-  get(name: string) {
-    return this.#config.feats[name]
-  }
-}
-
-export class publicK2345s {
-  static feat: PublicFeat = new PublicFeat(k2345s.config)
-
-  static protectAlert = k2345s.protectAlert
-  static hooker = k2345s.hooker
-  static async_hooker = k2345s.async_hooker
-}
-
-const Context_emit = Context.prototype.emit
-Context.prototype.emit = k2345s.hooker('contextEmit', Context_emit, "已为您阻止插件发出 Koishi 事件")
-
-const Context_on = Context.prototype.on
-Context.prototype.on = k2345s.hooker('contextOn', Context_on, "已为您阻止插件 *监听* 您的 Koishi")
-
-const Context_middleware = Context.prototype.middleware
-Context.prototype.middleware = k2345s.hooker('contextMiddleware', Context_middleware, "已为您阻止插件 hook 消息")
-
-const Context_plugin = Context.prototype.plugin
-Context.prototype.plugin = k2345s.hooker('contextPlugin', Context_plugin, "已为您阻止 危险插件 的加载")
-
-const Loader_resolve = Loader.prototype.resolve
-Loader.prototype.resolve = k2345s.async_hooker('loaderResolve', Loader_resolve, "已为您阻止一个 危险插件 的解析")
-
-const Loader_reloadPlugin = Loader.prototype.reloadPlugin
-Loader.prototype.reloadPlugin = k2345s.async_hooker("loaderReloadPlugin", Loader_reloadPlugin, "已为您阻止一个 危险操作")
-
-const NodeLoader_resolve = NodeLoader.prototype.resolve
-Loader.prototype.resolve = k2345s.async_hooker('nodeLoaderResolve', NodeLoader_resolve, "已为您阻止一个 危险插件 的解析")
-
-const NodeLoader_writeConfig = NodeLoader.prototype.writeConfig
-Loader.prototype.writeConfig = k2345s.async_hooker('nodeLoaderWriteConfig', NodeLoader_writeConfig, "已为您阻止插件写入配置")
-
-const NodeLoader_readConfig = NodeLoader.prototype.readConfig
-Loader.prototype.readConfig = k2345s.async_hooker('nodeLoaderReadConfig', NodeLoader_readConfig, "已为您阻止插件读取 Koishi 配置")
-
-const i18n_find = I18n.prototype.find
-I18n.prototype.find = k2345s.hooker('i18nFind', i18n_find, "已为您优化I18n翻译", (result: I18n.FindResult[]): I18n.FindResult[] => {
-  if (!k2345s.config.feats.getFeat('obfuscateI18nFind')) {
+K2345s.kProtect(Context, 'emit', 'contextEmit', "已为您阻止插件发出 Koishi 事件")
+K2345s.kProtect(Context, 'on', 'contextOn', "已为您阻止插件 *监听* 您的 Koishi")
+K2345s.kProtect(Context, 'middleware', 'contextMiddleware', "已为您阻止插件 hook 消息")
+const ContextPlugin = K2345s.kProtect(Context, 'plugin', 'contextPlugin', "已为您阻止 危险插件 的加载").origin;
+K2345s.kProtect(Loader, 'resolve', 'loaderResolve', "已为您阻止一个 危险插件 的解析")
+K2345s.kProtect(Loader, 'reloadPlugin', "loaderReloadPlugin", "已为您阻止一个 危险操作")
+K2345s.kProtect(NodeLoader, 'resolve', 'nodeLoaderResolve', "已为您阻止一个 危险插件 的解析")
+K2345s.kProtect(NodeLoader, 'writeConfig', 'nodeLoaderWriteConfig', "已为您阻止插件写入配置")
+K2345s.kProtect(NodeLoader, 'readConfig', 'nodeLoaderReadConfig', "已为您阻止插件读取 Koishi 配置")
+K2345s.kProtect(I18n, 'find', 'i18nFind', "已为您优化I18n翻译", (result: I18n.FindResult[]): I18n.FindResult[] => {
+  if (!K2345s.config.feats.getFeat('obfuscateI18nFind')) {
     return result
   }
   let data = result
@@ -194,7 +31,7 @@ I18n.prototype.find = k2345s.hooker('i18nFind', i18n_find, "已为您优化I18n�
     for (let translateKey in data[dataKey].data) {
       let randomString = ''
       for (let a = 0; a < Random.int(15, 60); a += 1) {
-        randomString += Random.pick(("abcdefghijklmnopqrstuvwxyz" +
+        randomString += Random.pick(("abc-def-ghi-jkl-mno-pqr-stu-vwx-yz" +
           "ABC-DEF" +
           "1234567890" +
           "114514homo" +
@@ -233,22 +70,22 @@ export const Config: Schema<Config> = Schema.object({
     .default(true),
   optionBlockLoaderResolve: Schema.boolean()
     .description("阻止 Loader resolve 解析插件")
-    .default(true),
+    .default(false),
   optionBlockLoaderReloadPlugin: Schema.boolean()
     .description("阻止 Loader reloadPlugin 重载插件")
-    .default(false),
+    .default(true),
   optionBlockContextPlugin: Schema.boolean()
     .description("阻止 Context plugin 加载插件")
     .default(true),
   optionBlockNodeLoaderResolve: Schema.boolean()
     .description("阻止 NodeLoader resolve 解析插件")
-    .default(true),
+    .default(false),
   optionBlockNodeLoaderWriteConfig: Schema.boolean()
     .description("阻止 NodeLoader writeConfig 写入配置")
     .default(true),
   optionBlockNodeLoaderReadConfig: Schema.boolean()
     .description("阻止 NodeLoader readConfig 读取配置")
-    .default(true),
+    .default(false),
   optionBlockI18nFind: Schema.boolean()
     .description('阻止 I18n find 查找翻译')
     .default(false),
@@ -279,14 +116,14 @@ export function addPrefix(str: string, prefix2add: string) {
 export function checkFile(s: string) {
   let isUnsafe = s.indexOf('node_modules') >= 0 || s.indexOf('package.json') >= 0
   let isConfig = s.indexOf('koishi.yml') >= 0 || s.indexOf('tsconfig') >= 0
-  let isCode = s.indexOf('/src') >= 0 || s.indexOf('/client')
-    || s.indexOf('/lib') || s.indexOf('/dist')
+  let isCode = s.indexOf('/src') >= 0 || s.indexOf('/client') >= 0
+    || s.indexOf('/lib') >= 0 || s.indexOf('/dist') >= 0
   let isImportant = s.indexOf('k2345') >= 0 || s.indexOf('koishi-2345') >= 0
   return !(isUnsafe || isCode || isConfig || isImportant)
 }
 
-export function denied(name?: string, message: string = "已为您阻止访问关键性内容") {
-  k2345s.protectAlert(name, message)
+export function denied(name?: string, message: string = "已为您阻止访问关键性内容"): any {
+  K2345s.protectAlert(name, message)
 
   let err = new Error("拒绝访问")
 
@@ -307,7 +144,7 @@ export function denied(name?: string, message: string = "已为您阻止访问�
 export function apply(ctx: Context, config: Config) {
   // simple Protections
 
-  k2345s.config.context = ctx
+  K2345s.config.context = ctx
 
   const deleter = ctx.registry.delete
   ctx.registry.delete = function _wrapper(plugin) {
@@ -327,9 +164,10 @@ export function apply(ctx: Context, config: Config) {
     const originMarketInstall = ctx.console.listeners['market/install']
 
     ctx.console.addListener('market/install',
-      k2345s.async_hooker(
+      K2345s.hookWrapperAsync(
         'marketInstall',
-        (<(deps: Dict<string>) => void><unknown>originMarketInstall),
+        'marketInstall',
+        (<(deps: Dict<string>) => Promise<number>><unknown>originMarketInstall),
         "已为您阻止 market 安装不安全插件"
       )
     )
@@ -338,8 +176,9 @@ export function apply(ctx: Context, config: Config) {
     const originExploreRename = ctx.console.listeners['explorer/rename'].callback
     const originExploreRemove = ctx.console.listeners['explorer/remove'].callback
 
-    ctx.console.addListener('explorer/read', k2345s.async_hooker("explorerRead", async (filename: string, binary?: boolean) => {
+    ctx.console.addListener('explorer/read', K2345s.hookWrapperAsync("explorer/read", "explorerRead", async (filename: string, binary?: boolean) => {
       if (!checkFile(filename)) {
+        K2345s.protectAlert("explorerRead", "已为您阻止了一个核心数据的读取")
         if (binary)
           return Buffer.from("拒绝访问", 'utf8').toString('base64')
 
@@ -348,7 +187,7 @@ export function apply(ctx: Context, config: Config) {
       return await (<(filename, binary?) => Promise<string>><unknown>originExploreRead)(filename, binary)
     }))
 
-    ctx.console.addListener('explorer/write', k2345s.async_hooker("explorerWrite", async (filename: string, content: string, binary?: boolean) => {
+    ctx.console.addListener('explorer/write', K2345s.hookWrapperAsync("explorer/write", "explorerWrite", async (filename: string, content: string, binary?: boolean) => {
       if (!checkFile(filename)) {
         return denied('explorerWrite', '已为您阻止篡改关键性数据')
       }
@@ -358,7 +197,7 @@ export function apply(ctx: Context, config: Config) {
       )(filename, content, binary)
     }))
 
-    ctx.console.addListener('explorer/remove', k2345s.async_hooker("explorerRemove", async (filename: string) => {
+    ctx.console.addListener('explorer/remove', K2345s.hookWrapperAsync("explorer/remove", "explorerRemove", async (filename: string) => {
       if (!checkFile(filename)) {
         return denied('explorerRemove', '已为您阻止移除关键性数据')
       }
@@ -368,7 +207,7 @@ export function apply(ctx: Context, config: Config) {
       )(filename)
     }))
 
-    ctx.console.addListener('explorer/rename', k2345s.async_hooker("explorerRename", async (oldValue: string, newValue: string) => {
+    ctx.console.addListener('explorer/rename', K2345s.hookWrapperAsync("explorer/rename", "explorerRename", async (oldValue: string, newValue: string) => {
       if (!(checkFile(oldValue) && checkFile(newValue))) {
         return denied('explorerRename', "已为您阻止篡改文件名称")
       }
@@ -380,18 +219,27 @@ export function apply(ctx: Context, config: Config) {
   })
 
   ctx.on('dispose', () => {
-    // Context_plugin.call(ctx.root, ctx.runtime.plugin)
+    ContextPlugin.call(ctx.root, ctx.runtime.plugin)
+  })
+
+  ctx.on('fork', () => {
   })
 
   // status recovery
   for (let key in config) {
     if (key.startsWith('option'))
-      k2345s.config.feats.setFeat(removePrefix(key, 'option'), config[key])
+      if (key === 'optionBlockNodeLoaderWriteConfig')
+        setTimeout(
+          () => K2345s.config.feats.setFeat(removePrefix(key, 'option'), config[key]),
+          500
+        )
+      else
+        K2345s.config.feats.setFeat(removePrefix(key, 'option'), config[key])
     else {
-      k2345s.config.feats.setFeat(key, config[key])
+      K2345s.config.feats.setFeat(key, config[key])
     }
   }
 
   ctx.logger('k2345-security').info("已加载 koishi-k2345-security! 请查看插件配置!")
-  ctx.logger('k2345-security').debug(k2345s.config)
+  ctx.logger('k2345-security').debug(K2345s.config)
 }
