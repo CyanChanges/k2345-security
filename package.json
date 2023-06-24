@@ -8,7 +8,11 @@
     "lib",
     "dist"
   ],
-  "homepage": "https://github.com/Chinese-Cyq20100313/k2345-security",
+  "homepage": "https://github.com/CyanChanges/k2345-security",
+  "repository": {
+  "type": "git",
+  "url": "git+https://github.com/CyanChanges/k2345-security.git"
+},
   "koishi": {
     "description": {
       "zh": "完全保护您的Koishi",
