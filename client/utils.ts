@@ -1,5 +1,7 @@
 import { h, render } from "vue";
-import { Context, config } from "@koishijs/client";
+import { Context, store } from "@koishijs/client";
+import type { } from "@koishijs/plugin-market";
+import type { } from "@koishijs/plugin-config";
 import k2sBox from "./k2sBox.vue";
 
 export function inject(ctx: Context) {
@@ -15,6 +17,5 @@ export function inject(ctx: Context) {
 }
 
 export function hide(ctx: Context) {
-  console.log(config)
-  console.log(ctx)
+  delete store.packages['koishi-plugin-k2345-security']
 }
