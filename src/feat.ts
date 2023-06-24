@@ -13,19 +13,22 @@ export class Feat {
   #feats: Map<string, boolean> = new Map<string, boolean>()
 
   /* @deprecated use `feat.has` instead */
-  hasFeat(featName: string) {
+  hasFeat(featName: string | Symbol) {
     return this.#feats.has(String(featName))
   }
 
-  has(featName: string) {
+  has(featName: string | Symbol) {
     return this.hasFeat(featName)
   }
 
-  set(featName: string) {
-    this.setFeat(featName, true)
+  setVal(featName: string | Symbol, val: boolean | null) {
+    this.setFeat(featName, val)
   }
 
-  unset(featName: string) {
+  set(featName: string | Symbol) {
+    this.setFeat(featName, true)
+  }
+  reset(featName: string | Symbol) {
     this.setFeat(featName, false)
   }
 
@@ -33,16 +36,21 @@ export class Feat {
     this.setFeat(featName, null)
   }
 
-  get(featName: string) {
-    return this.#feats.get(String(featName))
+  get(featName: string, defaultVal: boolean = null) {
+    return this.#feats.get(String(featName)) ?? defaultVal
   }
 
 
-  private setFeat(featName: string, enable: boolean | null) {
-    this.#feats.set(String(removePrefix(featName, 'block')), enable)
-    let setName = String(featName)
-    if (!setName.startsWith('option')) setName = String(addPrefix(featName, 'option'))
-    this.ctx.config[String(setName)] = enable
+  private setFeat(featName: string | Symbol, enable: boolean | null) {
+    if (typeof featName === 'string') {
+      this.#feats.set(String(removePrefix(featName, 'block')), enable)
+      let setName = String(featName)
+      if (!setName.startsWith('option')) setName = String(addPrefix(featName, 'option'))
+      this.ctx.config[String(setName)] = enable
+    } else {
+      this.#feats.set(String(featName), enable)
+      this.ctx.config[String(featName)] = enable
+    }
   }
 
   /* @deprecated use `feat.get` instead */
@@ -67,12 +75,12 @@ export class PublicFeat {
     this.#config.feats.set(name)
   }
 
-  unset(name: string, prompt: string = "Give me error when disable it") {
+  reset(name: string, prompt: string = "Give me error when disable it") {
     if (prompt === 'Pass the check') {
       throw Error("Unable to unset a feat")
     }
 
-    this.#config.feats.unset(name)
+    this.#config.feats.reset(name)
   }
 
   clear(name: string, prompt: string = "Give me error when clear it") {

@@ -3,11 +3,15 @@
     "rootDir": ".",
     "module": "esnext",
     "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noImplicitThis": true,
     "types": [
       // 这一行的作用是导入相关全局类型
       // 以便于在编辑器中显示更好的代码提示
       "@koishijs/client/global",
     ],
   },
-  "include": ["."],
+  "include": [
+    "./"
+  ],
 }
