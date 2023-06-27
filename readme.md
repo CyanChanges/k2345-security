@@ -6,7 +6,7 @@
 
 Koishi 2345 <del><small style="color: #0000000A">in</small></del>Security - Koishi 2345 安全中心
 
-保护您的Koishi不受 不安全插件 的侵害
+保护您的 Koishi 不受 _不安全插件_ 的侵害
 Prevent you from using koishi
 
 V股上市企业 114514 -  k2345 Team
