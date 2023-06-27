@@ -82,6 +82,7 @@ export function patchEdge(ctx: Context) {
     pageUnsupported(ctx, 'plugins')
     pageUnsupported(ctx, 'files')
     pageUnsupported(ctx, 'database')
+    pageUnsupported(ctx, 'sandbox')
   }, { flush: "post" })
 
   const edgePatcher = (p: typeof store) => {
