@@ -5,15 +5,17 @@ import K2sHistory from "./k2sHistory.vue";
 import { watch, watchEffect } from 'vue'
 import { i18n, message, root } from '@koishijs/client'
 import { useI18n } from "vue-i18n";
+import { k2Context } from './utils'
 
 import zhCN from "./k2s.zh-CN.yml";
 import enUS from "./k2s.en-US.yml";
 
 declare module '@koishijs/client' {
   interface Context {
-    k2s?: { injected: boolean }
+    k2s?: k2Context
   }
 }
+
 
 if (!root.k2s) {
   root.k2s = { injected: false }
@@ -37,7 +39,7 @@ if (import.meta.hot) {
 
 watchEffect(() => {
   if (root.k2s && !root.k2s.injected) {
-    setTimeout(()=>{
+    setTimeout(() => {
       message.info({
         message: t('messages.protect-under', [t('messages.safe-browsing')])
       })

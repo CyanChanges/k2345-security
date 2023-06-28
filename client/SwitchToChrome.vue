@@ -47,7 +47,7 @@ const onNoThanks = () => {
       </p>
       <p></p>
       <div class="uOlE2b">
-        <button class="LdSiCc g-c-nl g-c">{{ t('switch2chrome.no') }}</button>
+        <button class="LdSiCc g-c-nl g-c" @click="onNoThanks">{{ t('switch2chrome.no') }}</button>
         <a
           ref="yesElement"
           href="https://www.google.com/chrome/?brand=GGRF&amp;utm_source=google.com&amp;utm_medium=material-callout&amp;utm_campaign=cws&amp;utm_keyword=GGRF"

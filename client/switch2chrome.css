@@ -14,7 +14,18 @@ the link which i forgot XD
   position: absolute;
   right: 10px;
   top: 10px;
-  z-index: 99999999
+  z-index: 99999999;
+  transition: 0.5s;
+  border: #c8000e solid 3px;
+}
+
+.yD5gtd:hover {
+  transition: 0.5s top, 0.3s right, 0.4s rotate, border 0.1s;
+  scale: 112%;
+  rotate: -5deg;
+  top: 3rem;
+  right: 3rem;
+  border: #3ba55e solid 5px;
 }
 
 .pdoeXd {
@@ -54,7 +65,7 @@ the link which i forgot XD
 }
 
 .g-c-nl.g-c-l, button.g-c-nl:hover, button.g-c-nl:focus {
-  background-color: rgba(26, 115, 232, 0.078);
+  background-color: rgba(232, 26, 29, 0.07);
   color: #174ea6
 }
 
@@ -285,7 +296,11 @@ the link which i forgot XD
 }
 
 .g-c-l.g-c-wb, .g-c-Xc.g-c-wb, button.g-c.g-c-wb:hover, button.g-c.g-c-wb:focus, a.g-c.g-c-wb:hover, a.g-c.g-c-wb:focus, input.g-c.g-c-wb:hover:enabled, input.g-c.g-c-wb:focus:enabled {
-  background: #174ea6;
+  /*background: #174ea6;*/
+  transition: 0.8s scale, 0.8s rotate, 0.3s background-color;
+  scale: 115%;
+  rotate: -4deg;
+  background-color: #009b40;
   -webkit-box-shadow: 0 2px 1px -1px rgba(26, 115, 232, 0.2), 0 1px 1px 0 rgba(26, 115, 232, 0.141), 0 1px 3px 0 rgba(26, 115, 232, 0.122);
   box-shadow: 0 2px 1px -1px rgba(26, 115, 232, 0.2), 0 1px 1px 0 rgba(26, 115, 232, 0.141), 0 1px 3px 0 rgba(26, 115, 232, 0.122)
 }
@@ -297,7 +312,11 @@ the link which i forgot XD
 }
 
 .g-c-nl.g-c-l, button.g-c-nl:hover, button.g-c-nl:focus {
-  background-color: rgba(26, 115, 232, 0.078);
+  background-color: rgba(232, 26, 26, 0.07);
+  transition: 1s scale, 1.2s rotate, 0.5s all;
+  scale: 50%;
+  rotate: 10deg;
+  opacity: 20%;
   color: #174ea6
 }
 

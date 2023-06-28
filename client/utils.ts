@@ -11,6 +11,10 @@ declare global {
   }
 }
 
+export interface k2Context {
+  injected: boolean
+}
+
 export function inject(ctx: Context) {
   // let k2sHolder = document.createElement("div")
   //
