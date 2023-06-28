@@ -1,0 +1,22 @@
+name: 'k2345 安全中心'
+
+messages:
+  protect-under: "您已受到 {0} 的保护"
+  safe-browsing: 'k2345 安全浏览'
+  protection-notice: '您的操作已被 k2345 保护'
+
+box:
+  notice: '恭喜您, 您的 Koishi 已受到 {0} 的保护! '
+
+history:
+  default-title: '「+」安全防护'
+  analyze: '位于 {0} (注册: {1})'
+
+unsupported:
+  message: '您的浏览器与 {0}{1} 不兼容'
+
+switch2chrome:
+  title: '改用 Chrome'
+  message: '您需要改用 Chrome，才能使用大多数 Koishi 功能。'
+  yes: 是
+  no: '不了，谢谢'

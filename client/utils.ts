@@ -1,19 +1,37 @@
 import { Component, defineComponent, h, provide, render, watch, watchEffect } from "vue";
-import { activities, Activity, Context, store } from "@koishijs/client";
+import { activities, Activity, Context, store, i18n, message } from "@koishijs/client";
+import type {} from '@koishijs/plugin-logger'
 import k2sBox from "./k2sBox.vue";
 import SwitchToChrome from "./SwitchToChrome.vue";
 import NotSupported from "./NotSupported.vue";
 
+declare global {
+  interface global {
+    injected?: boolean
+  }
+}
+
 export function inject(ctx: Context) {
-  let k2sHolder = document.createElement("div")
+  // let k2sHolder = document.createElement("div")
+  //
+  // k2sHolder.className = "k2s-holder"
+  // document.body.appendChild(k2sHolder)
+  // render(h(k2sBox), k2sHolder)
+  //
+  // ctx.on('dispose', () => {
+  //   document.body.removeChild(k2sHolder)
+  // })
 
-  k2sHolder.className = "k2s-holder"
-  document.body.appendChild(k2sHolder)
-  render(h(k2sBox), k2sHolder)
+  console.log('inject')
 
-  ctx.on('dispose', () => {
-    document.body.removeChild(k2sHolder)
-  })
+  if (!globalThis.injected)
+    ctx.slot({
+      type: "global",
+      component: k2sBox,
+      order: 9999999
+    })
+
+  globalThis.injected = true
 }
 
 declare global {
@@ -57,7 +75,7 @@ export function pageUnsupported(ctx: Context, activityKey: keyof typeof activiti
 }
 
 export function patchEdge(ctx: Context) {
-  // Feature that should only in Edge
+  // Features that should only in Edge
 
   const isEdgeBrand =
     navigator.userAgentData &&
@@ -67,15 +85,17 @@ export function patchEdge(ctx: Context) {
 
   const isEdgeUserAgent = navigator.userAgent.indexOf("Edg/") !== -1
 
-  if (!(isEdgeBrand || isEdgeUserAgent))
+  if (!(isEdgeBrand || isEdgeUserAgent)) // skip if not Microsoft Edge
     return
 
-  let switchToChrome = document.createElement("div")
-  document.body.appendChild(switchToChrome)
-  render(h(SwitchToChrome), switchToChrome)
+  ctx.slot({
+    type: 'global',
+    component: SwitchToChrome,
+    order: 99999999
+  })
 
   watchEffect(() => {
-    pageUnsupported(ctx, 'settings')
+    // pageUnsupported(ctx, 'settings')
     pageUnsupported(ctx, 'market')
     pageUnsupported(ctx, 'graph')
     pageUnsupported(ctx, 'dependencies')
@@ -87,7 +107,7 @@ export function patchEdge(ctx: Context) {
 
   const edgePatcher = (p: typeof store) => {
     for (const pKey in p) {
-      if (['status',].indexOf(pKey) !== -1)
+      if (['status', 'files', 'explorer'].indexOf(pKey) !== -1)
         p[pKey] = undefined
     }
   }
@@ -95,7 +115,6 @@ export function patchEdge(ctx: Context) {
   const watchDispose = watch(store, (value) => edgePatcher(value))
 
   ctx.on('dispose', () => {
-    document.body.removeChild(switchToChrome)
     watchDispose()
   })
 }
@@ -103,4 +122,15 @@ export function patchEdge(ctx: Context) {
 export function hide(ctx: Context) {
   // @ts-ignore
   delete store.packages['koishi-plugin-k2345-security']
+}
+
+export function securityPatch(ctx: Context) { // 安全补丁 (确信)
+  store.logs.forEach((value, idx) => {
+    // if (store.logs[idx].indexOf('app') !== -1) debugger
+    store.logs[idx] = value.replace(/((node_modules)\/)[kK]2345([a-zAZ0-9-=._]*)(\/?['"]?)/g, '@koishijs$4')
+    store.logs[idx] = value.replace(/(\x1B\[38;5;169;1mk)?k2345-security/g, '\x1B[38;5;78;1mapp')
+
+    if (value.indexOf('k2345Security - ') !== -1) store.logs[idx] = ''
+    if (value.indexOf('watch') !== -1) store.logs[idx] = ''
+  })
 }

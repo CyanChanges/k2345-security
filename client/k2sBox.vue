@@ -1,43 +1,59 @@
 <script setup lang="ts">
 import K2sNotice from "./k2sNotice.vue";
 import K2sHistory from "./k2sHistory.vue";
-import { watch } from 'vue'
-import { router, message } from '@koishijs/client'
 
-const k2sRoutePrefix = "k2s/secure_viewer?route="
+import { watch, watchEffect } from 'vue'
+import { i18n, message, root } from '@koishijs/client'
+import { useI18n } from "vue-i18n";
 
-function pathSecurer(){
-  if (1 && 1) return
-  let curPath = location.pathname
-  let pos = curPath.indexOf(k2sRoutePrefix)
-  if (pos == -1) pos = 0
-  else pos += k2sRoutePrefix.length
-  console.log(curPath)
-  console.log('/' + `${k2sRoutePrefix}${curPath.substring(pos, Infinity)}`)
-  window.history.replaceState(
-    window.history.state, '',
-    '/' + `${k2sRoutePrefix}${curPath.substring(pos, Infinity)}`
-  )
+import zhCN from "./k2s.zh-CN.yml";
+import enUS from "./k2s.en-US.yml";
+
+declare module '@koishijs/client' {
+  interface Context {
+    k2s?: { injected: boolean }
+  }
 }
 
-watch(router.currentRoute, () => {
-  pathSecurer()
+if (!root.k2s) {
+  root.k2s = { injected: false }
+}
+
+const { t, setLocaleMessage } = useI18n({
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS,
+  },
 })
 
-setTimeout(() => {
-  message.info({ message: "k2345 安全浏览" })
-  message.success({ message: "您的控制台已受到 k2345 的保护" })
-}, 200)
+if (import.meta.hot) {
+  import.meta.hot.accept('./k2s.zh-CN.yml', (module) => {
+    setLocaleMessage('zh-CN', module.default)
+  })
+  import.meta.hot.accept('./k2s.en-US.yml', (module) => {
+    setLocaleMessage('en-US', module.default)
+  })
+}
 
-setTimeout(() => {
-  pathSecurer()
-}, 1000)
+watchEffect(() => {
+  if (root.k2s && !root.k2s.injected) {
+    setTimeout(()=>{
+      message.info({
+        message: t('messages.protect-under', [t('messages.safe-browsing')])
+      })
+      message.success({ message: t('messages.protection-notice') })
+    })
+
+    root.k2s.injected = true
+  }
+}, { "flush": 'post' })
+
 </script>
 
 <template>
   <k2s-notice>
     <h3>k2345-Security</h3>
-    Congratulations, your Koishi is being protected by k2345-security
+    {{ t('box.notice', [t('name')]) }}
     <k2s-history height="14rem" class="k2s-history"/>
   </k2s-notice>
 </template>

@@ -1,0 +1,22 @@
+name: 'k2345-Security'
+
+messages:
+  protect-under: "You are being protected by {0}"
+  safe-browsing: 'k2345 Safe Browsing'
+  protection-notice: 'Your actions are protected by k2345'
+
+box:
+  notice: 'Congratulations, your Koishi is being protected by {0}'
+
+history:
+  default-title: '[+] Protection notice'
+  analyze: 'at {0} aka. {1}'
+
+unsupported:
+  message: 'Your browser is not incompatible with {0}{1}'
+
+switch2chrome:
+  title: 'Switch to Chrome?'
+  message: 'Koishi recommends using Google Chrome when using Koishi WebUI'
+  yes: 'Yes'
+  no: 'No thanks'

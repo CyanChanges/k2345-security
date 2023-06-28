@@ -3,11 +3,13 @@ import {} from '@koishijs/plugin-market'
 import {} from '@koishijs/plugin-console'
 import { watch, render, h } from 'vue'
 import k2sBox from './k2sBox.vue'
-import { patchEdge, hide, inject } from "./utils";
+import { hide, patchEdge, inject, securityPatch } from "./utils";
 
 
 export default (ctx: Context) => {
+  console.log('load')
+  hide(ctx)
   patchEdge(ctx)
   inject(ctx)
-  hide(ctx)
+  securityPatch(ctx)
 }

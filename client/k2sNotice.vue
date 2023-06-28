@@ -23,8 +23,8 @@ $paddingY: 1.5rem;
   & {
     border-radius: 8px;
     overflow: hidden;
-    background-color: var(--k-color-success);
-    border: 1px solid var(--k-color-success-shade);
+    background-color: var(--k-color-success-shade);
+    border: 1px solid var(--k-color-success-fade);
     box-shadow: var(--k-card-shadow);
     transition: var(--color-transition);
   }

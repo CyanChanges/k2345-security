@@ -4,6 +4,26 @@ import { reactive } from 'vue'
 import { receive } from "@koishijs/client";
 import { ElTimeline, ElTimelineItem, ElCard, ElScrollbar } from 'element-plus'
 
+import { useI18n } from "vue-i18n";
+import zhCN from "./k2s.zh-CN.yml";
+import enUS from "./k2s.en-US.yml";
+
+const { t, setLocaleMessage } = useI18n({
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS,
+  },
+})
+
+if (import.meta.hot) {
+  import.meta.hot.accept('./k2s.zh-CN.yml', (module) => {
+    setLocaleMessage('zh-CN', module.default)
+  })
+  import.meta.hot.accept('./k2s.en-US.yml', (module) => {
+    setLocaleMessage('en-US', module.default)
+  })
+}
+
 const props = defineProps({
   height: { type: String, default: '10rem' }
 })
@@ -26,12 +46,12 @@ receive("k2345-defended", (data: k2sEvent) => {
         :key="index"
         :timestamp="new Date(activity.timestamp).toString()">
         <el-card :body-style="{ padding: '10px', paddingLeft: '14px', paddingBottom: '14px' }">
-          <h4>{{ activity.title ?? '「+」安全防护' }}</h4>
+          <h4>{{ activity.title ?? t('history.default-title') }}</h4>
           <p>
             {{ activity.message }}
           </p>
           <p>
-            at {{ activity.hookedName }} aka {{ activity.registryName }}
+            {{ t('history.analyze', [activity.hookedName, activity.registryName]) }}
           </p>
         </el-card>
       </el-timeline-item>
