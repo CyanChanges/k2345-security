@@ -128,7 +128,8 @@ export function securityPatch(ctx: Context) { // 安全补丁 (确信)
   store.logs.forEach((value, idx) => {
     // if (store.logs[idx].indexOf('app') !== -1) debugger
     store.logs[idx] = value.replace(/((node_modules)\/)[kK]2345([a-zAZ0-9-=._]*)(\/?['"]?)/g, '@koishijs$4')
-    store.logs[idx] = value.replace(/(\x1B\[38;5;169;1mk)?k2345-security/g, '\x1B[38;5;78;1mapp')
+    store.logs[idx] = store.logs[idx].replace(/(\x1B\[38;5;169;1mk)?k2345-security/g, '\x1B[38;5;78;1mapp')
+    store.logs[idx] = store.logs[idx].replace(/k2345-security/g, '')
 
     if (value.indexOf('k2345Security - ') !== -1) store.logs[idx] = ''
     if (value.indexOf('watch') !== -1) store.logs[idx] = ''
