@@ -1,5 +1,6 @@
 # koishi-plugin-k2345-security
 
+![npm](https://img.shields.io/npm/dm/koishi-plugin-k2345-security?style=flat-square)
 [![npm](https://img.shields.io/npm/v/koishi-plugin-k2345-security?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-k2345-security)
 
 [Insecure]
