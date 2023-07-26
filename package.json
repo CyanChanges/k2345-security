@@ -43,14 +43,6 @@
   "peerDependencies": {
     "koishi": "^4.13.0"
   },
-  "dependencies": {
-    "@koishijs/plugin-config": "^2.0.0",
-    "@koishijs/plugin-database-sqlite": "^3.4.4",
-    "@koishijs/plugin-locales": "^2.2.7",
-    "element-plus": "^2.3.6",
-    "esbuild-register": "npm:@shigma/esbuild-register@^1.1.1",
-    "typescript": "^5.0.4"
-  },
   "devDependencies": {
     "@koishijs/client": "^5.11.0",
     "@koishijs/plugin-console": "^5.11.0"
